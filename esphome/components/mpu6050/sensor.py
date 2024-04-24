@@ -82,3 +82,6 @@ async def to_code(config):
     if CONF_TEMPERATURE in config:
         sens = await sensor.new_sensor(config[CONF_TEMPERATURE])
         cg.add(var.set_temperature_sensor(sens))
+
+    cg.add(var.sleep())
+    cg.add(var.wake())

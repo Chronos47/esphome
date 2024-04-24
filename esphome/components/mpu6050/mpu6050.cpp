@@ -8,6 +8,7 @@ static const char *const TAG = "mpu6050";
 
 const uint8_t MPU6050_REGISTER_WHO_AM_I = 0x75;
 const uint8_t MPU6050_REGISTER_POWER_MANAGEMENT_1 = 0x6B;
+const uint8_t MPU6050_REGISTER_POWER_MANAGEMENT_2 = 0x6C;
 const uint8_t MPU6050_REGISTER_GYRO_CONFIG = 0x1B;
 const uint8_t MPU6050_REGISTER_ACCEL_CONFIG = 0x1C;
 const uint8_t MPU6050_REGISTER_ACCEL_XOUT_H = 0x3B;
@@ -16,9 +17,46 @@ const uint8_t MPU6050_SCALE_2000_DPS = 0b11;
 const float MPU6050_SCALE_DPS_PER_DIGIT_2000 = 0.060975f;
 const uint8_t MPU6050_RANGE_2G = 0b00;
 const float MPU6050_RANGE_PER_DIGIT_2G = 0.000061f;
+const uint8_t MPU6050_BIT_DEVICE_RESET = 7;
 const uint8_t MPU6050_BIT_SLEEP_ENABLED = 6;
 const uint8_t MPU6050_BIT_TEMPERATURE_DISABLED = 3;
 const float GRAVITY_EARTH = 9.80665f;
+
+const uint8_t  LP_WAKE_CTRL_1_25 = 0x00
+const uint8_t  LP_WAKE_CTRL_2_5  = 0x01
+const uint8_t  LP_WAKE_CTRL_5    = 0x02
+const uint8_t  LP_WAKE_CTRL_10   = 0x03
+
+// Write register bit
+void MPU6050Component::writeRegisterBit(uint8_t reg, uint8_t pos, bool state) {
+  uint8_t value;
+  value = readRegister8(reg);
+
+  if (state)
+  {
+    value |= (1 << pos);
+  } 
+ else
+  {
+    value &= ~(1 << pos);
+  }
+
+  writeRegister8(reg, value);
+}
+
+// Write 8-bit to register
+void MPU6050Component::writeRegister8(uint8_t reg, uint8_t value) {
+  Wire.beginTransmission(MPU_addr);
+
+#if ARDUINO >= 100
+  Wire.write(reg);
+  Wire.write(value);
+#else
+  Wire.send(reg);
+  Wire.send(value);
+#endif
+  Wire.endTransmission();
+}
 
 void MPU6050Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up MPU6050...");
@@ -142,6 +180,29 @@ void MPU6050Component::update() {
   this->status_clear_warning();
 }
 float MPU6050Component::get_setup_priority() const { return setup_priority::DATA; }
+
+void MPU6050Component::lowPowerAccel(uint8_t frequency) {
+  uint8_t value;
+  value = readRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_2);
+  value &= 0b00111000;
+  value |= (frequency << 6) | 0b111;
+  writeRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_2, value);
+
+  value = readRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_1);
+  value &= 0b10010111;
+  value &= 0b10010111;
+  value |= 0b00111000;
+  writeRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_1, value);
+}
+
+void MPU6050Component::sleep() {
+	this->writeRegisterBit(MPU6050_REGISTER_POWER_MANAGEMENT_1, MPU6050_BIT_SLEEP_ENABLED, false);
+	this->lowPowerAccel(LP_WAKE_CTRL_1_25);
+}
+
+void MPU6050Component::wake() {
+	this->writeRegisterBit(MPU6050_REGISTER_POWER_MANAGEMENT_1, MPU6050_BIT_DEVICE_RESET, true);
+}
 
 }  // namespace mpu6050
 }  // namespace esphome
