@@ -24,14 +24,6 @@ class MPU6050Component : public PollingComponent, public i2c::I2CDevice {
   void set_gyro_y_sensor(sensor::Sensor *gyro_y_sensor) { gyro_y_sensor_ = gyro_y_sensor; }
   void set_gyro_z_sensor(sensor::Sensor *gyro_z_sensor) { gyro_z_sensor_ = gyro_z_sensor; }
 
-  void sleep();
-  void wake();
-  
- private:
-  void writeRegisterBit(uint8_t reg, uint8_t pos, bool state);
-  void writeRegister8(uint8_t reg, uint8_t value);
-  void lowPowerAccel(uint8_t frequency);
-
  protected:
   sensor::Sensor *accel_x_sensor_{nullptr};
   sensor::Sensor *accel_y_sensor_{nullptr};
