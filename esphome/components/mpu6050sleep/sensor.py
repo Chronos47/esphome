@@ -60,7 +60,7 @@ temperature_schema = sensor.sensor_schema(
 CONFIG_SCHEMA = (
     cv.Schema(
         {
-            cv.GenerateID(): cv.declare_id(MPU6050sleepComponent),
+            cv.GenerateID(): cv.declare_id(MPU6050SleepComponent),
             cv.Optional(CONF_ACCEL_X): accel_schema,
             cv.Optional(CONF_ACCEL_Y): accel_schema,
             cv.Optional(CONF_ACCEL_Z): accel_schema,
@@ -76,7 +76,7 @@ CONFIG_SCHEMA = (
 
 SLEEP_WAKE_ACTION_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.use_id(MPU6050sleepComponent),
+        cv.GenerateID(): cv.use_id(MPU6050SleepComponent),
     }
 )
 
