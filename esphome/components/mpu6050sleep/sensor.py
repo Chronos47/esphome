@@ -80,6 +80,7 @@ SLEEP_WAKE_ACTION_SCHEMA = cv.Schema(
     }
 )
 
+
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
@@ -99,26 +100,24 @@ async def to_code(config):
         sens = await sensor.new_sensor(config[CONF_TEMPERATURE])
         cg.add(var.set_temperature_sensor(sens))
 
-    
-
 
 @automation.register_action(
     "mpu6050sleep.sleep",
     SleepAction,
     automation.maybe_simple_id(SLEEP_WAKE_ACTION_SCHEMA),
 )
+async def mpu6050sleep_sleep_action_to_code(config, action_id, template_arg, args):
+    var = cg.new_Pvariable(action_id, template_arg)
+    await cg.register_parented(var, config[CONF_ID])
+    return var
+
+
 @automation.register_action(
     "mpu6050sleep.wake",
     WakeAction,
     automation.maybe_simple_id(SLEEP_WAKE_ACTION_SCHEMA),
 )
-
-async def sleep_action_to_code(config, action_id, template_arg, args):
-    var = cg.new_Pvariable(action_id, template_arg)
-    await cg.register_parented(var, config[CONF_ID])
-    return var
-
-async def wake_action_to_code(config, action_id, template_arg, args):
+async def mpu6050sleep_wake_action_to_code(config, action_id, template_arg, args):
     var = cg.new_Pvariable(action_id, template_arg)
     await cg.register_parented(var, config[CONF_ID])
     return var

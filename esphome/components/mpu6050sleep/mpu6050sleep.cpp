@@ -22,43 +22,35 @@ const uint8_t MPU6050_BIT_SLEEP_ENABLED = 6;
 const uint8_t MPU6050_BIT_TEMPERATURE_DISABLED = 3;
 const float GRAVITY_EARTH = 9.80665f;
 
-const uint8_t  LP_WAKE_CTRL_1_25 = 0x00;
-const uint8_t  LP_WAKE_CTRL_2_5  = 0x01;
-const uint8_t  LP_WAKE_CTRL_5    = 0x02;
-const uint8_t  LP_WAKE_CTRL_10   = 0x03;
+const uint8_t LP_WAKE_CTRL_1_25 = 0x00;
+const uint8_t LP_WAKE_CTRL_2_5 = 0x01;
+const uint8_t LP_WAKE_CTRL_5 = 0x02;
+const uint8_t LP_WAKE_CTRL_10 = 0x03;
 
-uint8_t MPU6050SleepComponent::readRegister8(uint8_t reg) 
-{
+uint8_t MPU6050SleepComponent::read_register8(uint8_t reg) {
   uint8_t readRegister;
-  if(!this->read_byte(reg, &readRegister))
-  {
+  if (!this->read_byte(reg, &readRegister)) {
     this->mark_failed();
   }
   return readRegister;
 }
 
 // Write register bit
-void MPU6050SleepComponent::writeRegisterBit(uint8_t reg, uint8_t pos, bool state) {
+void MPU6050SleepComponent::write_register_bit(uint8_t reg, uint8_t pos, bool state) {
   uint8_t value;
-  value = readRegister8(reg);
+  value = read_register8(reg);
 
-  if (state)
-  {
+  if (state) {
     value |= (1 << pos);
-  } 
- else
-  {
+  } else {
     value &= ~(1 << pos);
   }
 
-  writeRegister8(reg, value);
+  write_register8(reg, value);
 }
 
 // Write 8-bit to register
-void MPU6050SleepComponent::writeRegister8(uint8_t reg, uint8_t value) 
-{
-  this->write_byte(reg,value);
-}
+void MPU6050SleepComponent::write_register8(uint8_t reg, uint8_t value) { this->write_byte(reg, value); }
 
 void MPU6050SleepComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up MPU6050...");
@@ -183,28 +175,28 @@ void MPU6050SleepComponent::update() {
 }
 float MPU6050SleepComponent::get_setup_priority() const { return setup_priority::DATA; }
 
-void MPU6050SleepComponent::lowPowerAccel(uint8_t frequency) {
+void MPU6050SleepComponent::low_power_accel(uint8_t frequency) {
   uint8_t value;
-  value = readRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_2);
+  value = read_register8(MPU6050_REGISTER_POWER_MANAGEMENT_2);
   value &= 0b00111000;
   value |= (frequency << 6) | 0b111;
-  writeRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_2, value);
+  write_register8(MPU6050_REGISTER_POWER_MANAGEMENT_2, value);
 
-  value = readRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_1);
+  value = read_register8(MPU6050_REGISTER_POWER_MANAGEMENT_1);
   value &= 0b10010111;
   value &= 0b10010111;
   value |= 0b00111000;
-  writeRegister8(MPU6050_REGISTER_POWER_MANAGEMENT_1, value);
+  write_register8(MPU6050_REGISTER_POWER_MANAGEMENT_1, value);
 }
 
 void MPU6050SleepComponent::sleep() {
-	this->writeRegisterBit(MPU6050_REGISTER_POWER_MANAGEMENT_1, MPU6050_BIT_SLEEP_ENABLED, false);
-	this->lowPowerAccel(LP_WAKE_CTRL_1_25);
+  this->write_register_bit(MPU6050_REGISTER_POWER_MANAGEMENT_1, MPU6050_BIT_SLEEP_ENABLED, false);
+  this->low_power_accel(LP_WAKE_CTRL_1_25);
 }
 
 void MPU6050SleepComponent::wake() {
-	this->writeRegisterBit(MPU6050_REGISTER_POWER_MANAGEMENT_1, MPU6050_BIT_DEVICE_RESET, true);
+  this->write_register_bit(MPU6050_REGISTER_POWER_MANAGEMENT_1, MPU6050_BIT_DEVICE_RESET, true);
 }
 
-}  // namespace mpu6050
+}  // namespace mpu6050sleep
 }  // namespace esphome
