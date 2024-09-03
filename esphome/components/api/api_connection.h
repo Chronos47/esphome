@@ -82,6 +82,11 @@ class APIConnection : public APIServerConnection {
   bool send_time_info(datetime::TimeEntity *time);
   void time_command(const TimeCommandRequest &msg) override;
 #endif
+#ifdef USE_DATETIME_DATETIME
+  bool send_datetime_state(datetime::DateTimeEntity *datetime);
+  bool send_datetime_info(datetime::DateTimeEntity *datetime);
+  void datetime_command(const DateTimeCommandRequest &msg) override;
+#endif
 #ifdef USE_TEXT
   bool send_text_state(text::Text *text, std::string state);
   bool send_text_info(text::Text *text);
@@ -145,6 +150,7 @@ class APIConnection : public APIServerConnection {
   void on_voice_assistant_response(const VoiceAssistantResponse &msg) override;
   void on_voice_assistant_event_response(const VoiceAssistantEventResponse &msg) override;
   void on_voice_assistant_audio(const VoiceAssistantAudio &msg) override;
+  void on_voice_assistant_timer_event_response(const VoiceAssistantTimerEventResponse &msg) override;
 #endif
 
 #ifdef USE_ALARM_CONTROL_PANEL
@@ -156,6 +162,12 @@ class APIConnection : public APIServerConnection {
 #ifdef USE_EVENT
   bool send_event(event::Event *event, std::string event_type);
   bool send_event_info(event::Event *event);
+#endif
+
+#ifdef USE_UPDATE
+  bool send_update_state(update::UpdateEntity *update);
+  bool send_update_info(update::UpdateEntity *update);
+  void update_command(const UpdateCommandRequest &msg) override;
 #endif
 
   void on_disconnect_response(const DisconnectResponse &value) override;

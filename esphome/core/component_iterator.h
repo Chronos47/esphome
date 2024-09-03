@@ -63,6 +63,9 @@ class ComponentIterator {
 #ifdef USE_DATETIME_TIME
   virtual bool on_time(datetime::TimeEntity *time) = 0;
 #endif
+#ifdef USE_DATETIME_DATETIME
+  virtual bool on_datetime(datetime::DateTimeEntity *datetime) = 0;
+#endif
 #ifdef USE_TEXT
   virtual bool on_text(text::Text *text) = 0;
 #endif
@@ -83,6 +86,9 @@ class ComponentIterator {
 #endif
 #ifdef USE_EVENT
   virtual bool on_event(event::Event *event) = 0;
+#endif
+#ifdef USE_UPDATE
+  virtual bool on_update(update::UpdateEntity *update) = 0;
 #endif
   virtual bool on_end();
 
@@ -132,6 +138,9 @@ class ComponentIterator {
 #ifdef USE_DATETIME_TIME
     DATETIME_TIME,
 #endif
+#ifdef USE_DATETIME_DATETIME
+    DATETIME_DATETIME,
+#endif
 #ifdef USE_TEXT
     TEXT,
 #endif
@@ -152,6 +161,9 @@ class ComponentIterator {
 #endif
 #ifdef USE_EVENT
     EVENT,
+#endif
+#ifdef USE_UPDATE
+    UPDATE,
 #endif
     MAX,
   } state_{IteratorState::NONE};

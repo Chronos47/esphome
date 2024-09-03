@@ -71,6 +71,12 @@ bool ListEntitiesIterator::on_date(datetime::DateEntity *date) { return this->cl
 bool ListEntitiesIterator::on_time(datetime::TimeEntity *time) { return this->client_->send_time_info(time); }
 #endif
 
+#ifdef USE_DATETIME_DATETIME
+bool ListEntitiesIterator::on_datetime(datetime::DateTimeEntity *datetime) {
+  return this->client_->send_datetime_info(datetime);
+}
+#endif
+
 #ifdef USE_TEXT
 bool ListEntitiesIterator::on_text(text::Text *text) { return this->client_->send_text_info(text); }
 #endif
@@ -91,6 +97,9 @@ bool ListEntitiesIterator::on_alarm_control_panel(alarm_control_panel::AlarmCont
 #endif
 #ifdef USE_EVENT
 bool ListEntitiesIterator::on_event(event::Event *event) { return this->client_->send_event_info(event); }
+#endif
+#ifdef USE_UPDATE
+bool ListEntitiesIterator::on_update(update::UpdateEntity *update) { return this->client_->send_update_info(update); }
 #endif
 
 }  // namespace api
